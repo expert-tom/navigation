@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-15",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.4 (tags/v3.14.4:23116f9, Apr  7 2026, 14:10:54) [MSC v.1944 64 bit (AMD64)]",
+  "numpy": "2.4.4",
+  "tests_run": 105,
+  "failures": 0,
+  "errors": 0,
+  "test_seconds": 4.59098289999929,
+  "ros2_runtime_tested": false,
+  "hardware_tested": false,
+  "note": "Desktop synthetic benchmarks only. Target NUC timings / TF / sensor / stop response require field verification.",
+  "cloud_benchmarks": [
+    {
+      "points": 20000,
+      "obstacles": 3547,
+      "median_seconds": 0.03599860000031185,
+      "worst_seconds": 0.04940290000013192
+    },
+    {
+      "points": 50000,
+      "obstacles": 3582,
+      "median_seconds": 0.0457643999998254,
+      "worst_seconds": 0.050793299998986186
+    },
+    {
+      "points": 300000,
+      "obstacles": 3584,
+      "median_seconds": 0.14879350000046543,
+      "worst_seconds": 0.17071719999876223
+    }
+  ],
+  "python310_syntax_checked_files": 42,
+  "bundled_dependency_hashes_verified": true
+}

@@ -1,0 +1,45 @@
+{
+  "scenario": "normal",
+  "completed": true,
+  "simulated_seconds": 115.35,
+  "route_points": 194,
+  "completed_points": 194,
+  "parking_error_m": 0.0566,
+  "min_obstacle_clearance_m": 0.5552,
+  "transitions": [
+    {
+      "time": 0.0,
+      "state": "DEPART",
+      "waypoint": 0
+    },
+    {
+      "time": 10.4,
+      "state": "LOWER_CCW",
+      "waypoint": 18
+    },
+    {
+      "time": 45.2,
+      "state": "UPPER_CW",
+      "waypoint": 77
+    },
+    {
+      "time": 92.6,
+      "state": "LOWER_EXIT",
+      "waypoint": 156
+    },
+    {
+      "time": 104.6,
+      "state": "RETURN",
+      "waypoint": 176
+    },
+    {
+      "time": 115.35,
+      "state": "COMPLETE",
+      "waypoint": 194
+    }
+  ],
+  "robot_radius_m": 0.29,
+  "safety_margin_m": 0.1,
+  "robot_model": "assets/sentry_robot_cylinder.xacro",
+  "assumptions": "碰撞尺寸取自所附xacro；理想二维底盘、精确位姿、假定场地和速度标定；非实车验收"
+}

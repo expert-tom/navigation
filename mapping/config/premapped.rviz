@@ -1,0 +1,81 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Tool Properties
+    Name: Tool Properties
+Visualization Manager:
+  Class: ""
+  Global Options:
+    Fixed Frame: race_map
+    Frame Rate: 20
+    Background Color: 40; 40; 40
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Ground Grid
+      Enabled: true
+      Cell Size: 1
+      Plane: XY
+    - Class: rviz_default_plugins/Map
+      Name: Saved navigation map
+      Enabled: true
+      Topic:
+        Value: /race/map
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        Depth: 1
+      Alpha: 0.7
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Enabled: true
+      Show Names: true
+    - Class: rviz_default_plugins/PointCloud2
+      Name: Live LiDAR
+      Enabled: true
+      Topic:
+        Value: /race/points
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        Depth: 1
+      Size (m): 0.03
+      Style: Points
+      Color Transformer: AxisColor
+    - Class: rviz_default_plugins/Path
+      Name: Ordered figure eight
+      Enabled: true
+      Topic:
+        Value: /navigation/reference_path
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        Depth: 1
+      Color: 0; 255; 100
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/SetInitialPose
+      Topic:
+        Value: /race/initialpose
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        Depth: 1
+      X std deviation: 0.15
+      Y std deviation: 0.15
+      Theta std deviation: 0.15
+    - Class: rviz_default_plugins/PublishPoint
+      Topic:
+        Value: /clicked_point
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        Depth: 1
+      Single click: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      Name: Top Down
+      Scale: 70
+      Target Frame: race_map
+      X: 0
+      Y: 0
+Window Geometry:
+  Width: 1200
+  Height: 850

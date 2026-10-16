@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>导航赛道仿真回放</title>
+<style>
+body{font-family:system-ui,"Microsoft YaHei",sans-serif;background:#f3f6fa;color:#18283a;margin:0;padding:24px}
+main{max-width:1050px;margin:auto}h1{font-size:26px}p{line-height:1.7}section{background:white;border-radius:12px;padding:18px;margin:16px 0}
+.layout{display:grid;grid-template-columns: minmax(300px,650px) 1fr;gap:20px}canvas{width:100%;background:#f8fafc;border:1px solid #dde5ee}
+button,select{padding:9px 14px;border:1px solid #bbcbdc;border-radius:6px;background:white;font-size:15px}input{width:100%}
+dl{line-height:2}dt{color:#516277}dd{margin:0 0 12px;font-weight:600}.muted{color:#516277;font-size:14px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}}
+</style>
+<main><h1>导航赛道 · 二维仿真回放</h1><p>停车位出发 → 下瓣逆时针 → 上瓣顺时针 → 返回停车位。拖动时间轴或播放，观察车辆、路线进度与控制指令。</p>
+<section><select id="scenario"><option value="normal">正常运行</option><option value="obstacle">临时障碍</option><option value="localization_loss">定位暂时失效</option></select>
+<button id="play">播放</button><button id="reset">回到起点</button><select id="speed"><option value="1">1倍速</option><option value="5" selected>5倍速</option><option value="10">10倍速</option></select></section>
+<section class="layout"><div><canvas id="map" width="650" height="650"></canvas><input id="timeline" type="range" min="0" value="0" step="1"><p class="muted">灰色：参考路线　蓝色：已走轨迹　绿色：车体　深色：轮子　绿色虚线：规划半径＋安全距离</p></div>
+<div><dl><dt>模拟时间</dt><dd id="time"></dd><dt>任务状态</dt><dd id="state"></dd><dt>路线进度</dt><dd id="progress"></dd><dt>协议控制量（不是m/s）</dt><dd id="command"></dd><dt>当前坐标</dt><dd id="pose"></dd></dl>
+<p id="explanation"></p><p id="model" class="muted"></p><p class="muted">车体与轮子形状来自所附xacro碰撞几何。仍使用精确模拟位姿、圆形障碍和无惯性底盘；场地、速度映射、雷达安装外参尚待实测。</p></div></section>
+<section><p>工作流程：模拟位姿与障碍 → 有序路点与避障规划 → 路径跟踪 → 车体坐标转换 → 控制保护 → 19字节打包 → 模拟底盘 → 下一次位姿。</p><p>临时障碍占据必须经过的路点时，系统等待障碍移开；定位失效时停下，定位恢复后继续。A*绕行在独立测试中验证。</p></section></main>
+<script>
+const data = __DATA__;
+const $=id=>document.getElementById(id), ctx=$('map').getContext('2d');
+let scene='normal', index=0, playing=false, last=0;
+const names={DEPART:'驶离停车位',LOWER_CCW:'下瓣逆时针',UPPER_CW:'上瓣顺时针',LOWER_EXIT:'下瓣出口',RETURN:'返回停车位',COMPLETE:'完成并停车',BLOCKED:'障碍阻挡，零速等待',WAIT_SENSOR:'定位失效，零速等待'};
+function pos(p){const b=data.config.bounds;return [35+(p[0]-b[0])/(b[1]-b[0])*580,615-(p[1]-b[2])/(b[3]-b[2])*580]}
+function line(points,color,width){ctx.beginPath();points.forEach((p,i)=>{const [x,y]=pos(p);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
+function circle(p,r,color){const [x,y]=pos(p);ctx.beginPath();ctx.arc(x,y,r*580/(data.config.bounds[1]-data.config.bounds[0]),0,Math.PI*2);ctx.fillStyle=color;ctx.fill()}
+function robot(row,c){const center=[row[1],row[2]],yaw=row[3],model=data.robot_model;
+if(model){for(const part of model.components){ctx.beginPath();part.outline_xy.forEach((p,i)=>{const world=[center[0]+Math.cos(yaw)*p[0]-Math.sin(yaw)*p[1],center[1]+Math.sin(yaw)*p[0]+Math.cos(yaw)*p[1]];const [x,y]=pos(world);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.closePath();ctx.fillStyle=part.link==='base_link'?'#16a34a':'#334155';ctx.fill()}}
+else circle(center,c.robot_radius,'#16a34a');
+const [x,y]=pos(center);ctx.beginPath();ctx.arc(x,y,(c.robot_radius+c.margin)*580/(c.bounds[1]-c.bounds[0]),0,Math.PI*2);ctx.strokeStyle='#15803d';ctx.setLineDash([4,4]);ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
+line([center,[center[0]+0.22*Math.cos(yaw),center[1]+0.22*Math.sin(yaw)]],'#fff',2);
+}
+function draw(){const d=data.scenarios[scene],r=d.rows[index],c=data.config;ctx.clearRect(0,0,650,650);ctx.strokeStyle='#ccd6e1';ctx.lineWidth=1;ctx.strokeRect(35,35,580,580);
+ctx.setLineDash([5,5]);line([c.parking,...d.route],'#8a97a8',1.5);ctx.setLineDash([]);line(d.rows.slice(0,index+1).map(r=>[r[1],r[2]]),'#1769aa',2.5);
+circle(c.lower_pole,c.pole_radius,'#e89532');circle(c.upper_pole,c.pole_radius,'#e89532');circle(c.parking,0.06,'#111827');
+if(scene==='obstacle'&&r[0]>=0.5&&r[0]<5)circle(d.route[8],0.12,'#dc2626');robot(r,c);
+$('time').textContent=r[0].toFixed(2)+'秒 / '+d.report.simulated_seconds+'秒';$('state').textContent=names[r[7]]||r[7];$('progress').textContent=r[6]+' / '+d.route.length;
+$('command').textContent='vx='+r[4].toFixed(3)+'，vy='+r[5].toFixed(3);$('pose').textContent='x='+r[1].toFixed(2)+'，y='+r[2].toFixed(2);
+$('model').textContent='规划半径 '+c.robot_radius.toFixed(2)+'米 + 安全距离 '+c.margin.toFixed(2)+'米。'+(data.robot_model?'所附模型碰撞包络上界 '+data.robot_model.collision_bound_m.toFixed(4)+'米。':'');
+$('explanation').textContent=r[7]==='BLOCKED'?'当前路点被占据，不能跳过绕桩要求，持续输出零速。':r[7]==='WAIT_SENSOR'?'定位结果不可用，暂停运动，等待有效数据。':r[7]==='COMPLETE'?'全部有序路点完成，进入停车范围并输出零速。':'跟踪当前路点，达到后才进入下一路点；两次交叉点由序号区分。';$('timeline').value=index}
+function reset(){index=0;playing=false;$('play').textContent='播放';$('timeline').max=data.scenarios[scene].rows.length-1;draw()}
+$('scenario').onchange=()=>{scene=$('scenario').value;reset()};$('reset').onclick=reset;$('timeline').oninput=()=>{index=Number($('timeline').value);draw()};
+$('play').onclick=()=>{playing=!playing;last=performance.now();$('play').textContent=playing?'暂停':'播放'};
+let accumulated=0;
+function animate(now){if(playing){accumulated+=(now-last)/1000*Number($('speed').value);const steps=Math.floor(accumulated/0.05);if(steps){accumulated-=steps*0.05;index=Math.min(index+steps,data.scenarios[scene].rows.length-1);draw();if(index===data.scenarios[scene].rows.length-1){playing=false;$('play').textContent='播放'}}}last=now;requestAnimationFrame(animate)}
+reset();requestAnimationFrame(animate);
+</script></html>

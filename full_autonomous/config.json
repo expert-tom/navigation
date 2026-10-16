@@ -1,0 +1,18 @@
+{
+  "parking": [-2.0, -2.0],
+  "lower_pole": [0.0, -1.0],
+  "upper_pole": [0.0, 1.0],
+  "pole_radius": 0.10,
+  "robot_radius": 0.29,
+  "robot_model": "assets/sentry_robot_cylinder.xacro",
+  "margin": 0.1,
+  "bounds": [-3.0, 3.0, -3.0, 3.0],
+  "grid_resolution": 0.1,
+  "waypoint_tolerance": 0.06,
+  "max_speed_mps": 0.15,
+  "tracking_gain": 1.5,
+  "state_timeout": 0.3,
+  "control_limit": 0.2,
+  "body_from_command": [[0.0, -1.0], [1.0, 0.0]],
+  "calibration_confirmed": false
+}

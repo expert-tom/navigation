@@ -1,0 +1,55 @@
+{
+  "scenario": "obstacle",
+  "completed": true,
+  "simulated_seconds": 119.6,
+  "route_points": 194,
+  "completed_points": 194,
+  "parking_error_m": 0.0566,
+  "min_obstacle_clearance_m": 0.1971,
+  "transitions": [
+    {
+      "time": 0.0,
+      "state": "DEPART",
+      "waypoint": 0
+    },
+    {
+      "time": 0.8,
+      "state": "BLOCKED",
+      "waypoint": 2
+    },
+    {
+      "time": 5.05,
+      "state": "DEPART",
+      "waypoint": 2
+    },
+    {
+      "time": 14.65,
+      "state": "LOWER_CCW",
+      "waypoint": 18
+    },
+    {
+      "time": 49.45,
+      "state": "UPPER_CW",
+      "waypoint": 77
+    },
+    {
+      "time": 96.85,
+      "state": "LOWER_EXIT",
+      "waypoint": 156
+    },
+    {
+      "time": 108.85,
+      "state": "RETURN",
+      "waypoint": 176
+    },
+    {
+      "time": 119.6,
+      "state": "COMPLETE",
+      "waypoint": 194
+    }
+  ],
+  "robot_radius_m": 0.29,
+  "safety_margin_m": 0.1,
+  "robot_model": "assets/sentry_robot_cylinder.xacro",
+  "assumptions": "碰撞尺寸取自所附xacro；理想二维底盘、精确位姿、假定场地和速度标定；非实车验收"
+}

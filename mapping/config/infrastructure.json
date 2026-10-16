@@ -1,0 +1,21 @@
+{
+  "description": "EXAMPLE ONLY. Verify actual message frames and both measured rigid transforms before setting confirmations.",
+  "frames_confirmed": false,
+  "extrinsics_confirmed": false,
+  "timestamps_confirmed": false,
+  "odom_topic": "/Odometry",
+  "cloud_topic": "/livox/lidar/pointcloud",
+  "input_odom_frame": "camera_init",
+  "input_body_frame": "body",
+  "input_lidar_frame": "livox_frame",
+  "map_frame": "race_map",
+  "odom_frame": "race_odom",
+  "base_frame": "race_base",
+  "lidar_frame": "race_lidar",
+  "body_from_base": {"xyz": [0.0, 0.0, -0.4], "xyzw": [0.0, 0.0, 0.0, 1.0]},
+  "base_from_lidar": {"xyz": [0.0, 0.0, 0.4], "xyzw": [0.0, 0.0, 0.0, 1.0]},
+  "scan_min_height": 0.03,
+  "scan_max_height": 1.2,
+  "scan_range_min": 0.4,
+  "max_input_points": 300000
+}

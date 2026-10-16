@@ -1,0 +1,4 @@
+# New premapped pipeline; ROS2 dependencies are listed in README (not pip packages).
+pyserial==3.5
+numpy==1.26.4
+PyYAML==6.0.3

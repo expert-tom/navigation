@@ -1,0 +1,26 @@
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.deps/
+
+# Runtime logs, recordings and ROS build products
+logs/
+log/
+build/
+install/
+*.db3
+*.mcap
+rosbag2_*/
+
+# Local credentials and editor/system files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
